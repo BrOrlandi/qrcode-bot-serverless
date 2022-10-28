@@ -6,13 +6,16 @@
     "aws-sdk": "^2.1239.0",
     "dotenv": "^16.0.3",
     "express": "^4.17.1",
+    "qrcode": "^1.5.1",
     "serverless-http": "^2.7.0"
   },
   "devDependencies": {
+    "nodemon": "^2.0.20",
     "serverless-dynamodb-local": "^0.2.40",
     "serverless-offline": "^11.1.3"
   },
   "scripts": {
-    "start": "nodemon --exec serverless offline"
+    "start": "nodemon --exec serverless offline",
+    "dev": "NODE_ENV=development nodemon handler.js"
   }
 }
