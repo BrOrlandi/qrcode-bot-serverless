@@ -2,6 +2,9 @@ require('dotenv');
 const AWS = require('aws-sdk');
 const express = require('express');
 const serverless = require('serverless-http');
+const QRCode = require('qrcode');
+const fs = require('fs');
+const os = require('os');
 
 const app = express();
 
@@ -59,8 +62,33 @@ app.post('/users', async (req, res) => {
   }
 });
 
-app.use((req, res, next) => res.status(404).json({
+app.post('/generate-qr-code', async (req, res) => {
+  const { content } = req.body;
+  if (typeof content !== 'string') {
+    res.status(400).json({ error: '\'content\' must be a string' });
+    return;
+  }
+
+  const filePath = `${os.tmpdir()}/qrcode-${Date.now()}.png`;
+  await QRCode.toFile(filePath, content, {
+    margin: 1,
+  });
+
+  const fileStream = fs.createReadStream(filePath);
+  fileStream.on('open', () => {
+    res.attachment('qrcode.png');
+    fileStream.pipe(res);
+  });
+});
+
+app.use((req, res) => res.status(404).json({
   error: 'Not Found',
 }));
 
 module.exports.handler = serverless(app);
+
+if (process.env.NODE_ENV === 'development') {
+  app.listen(3000, () => {
+    console.log('Listening on port 3000');
+  });
+}
