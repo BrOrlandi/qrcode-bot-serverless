@@ -74,11 +74,8 @@ app.post('/generate-qr-code', async (req, res) => {
     margin: 1,
   });
 
-  const fileStream = fs.createReadStream(filePath);
-  fileStream.on('open', () => {
-    res.attachment('qrcode.png');
-    fileStream.pipe(res);
-  });
+  const contents = fs.readFileSync(filePath, { encoding: 'base64' });
+  res.json({ result: contents });
 });
 
 app.use((req, res) => res.status(404).json({
